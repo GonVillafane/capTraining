@@ -1,0 +1,11 @@
+ID,title,genre,director,year,description,stock,rentedCount,price
+1,El Padrino,Drama,Francis Ford Coppola,1972,La historia de una familia de la mafia italiana en Nueva York,3,15,2.50
+2,Titanic,Romance,James Cameron,1997,Una historia de amor épica ambientada en el famoso barco,5,8,3.00
+3,Matrix,Ciencia Ficción,Lana Wachowski,1999,Un programador descubre la realidad de la Matrix,4,22,2.75
+4,Forrest Gump,Drama,Robert Zemeckis,1994,La vida extraordinaria de un hombre sencillo,2,12,2.50
+5,Pulp Fiction,Crimen,Quentin Tarantino,1994,Historias entrelazadas del mundo criminal,3,18,3.00
+6,El Rey León,Animación,Roger Allers,1994,Un león joven debe reclamar su lugar como rey,6,5,2.25
+7,Avengers: Endgame,Acción,Anthony Russo,2019,Los superhéroes se enfrentan a Thanos por última vez,4,25,3.50
+8,Jurassic Park,Aventura,Steven Spielberg,1993,Dinosaurios cobran vida en un parque temático,3,14,2.75
+9,Star Wars,Ciencia Ficción,George Lucas,1977,Una galaxia muy muy lejana...,2,20,3.00
+10,Casablanca,Romance,Michael Curtiz,1942,Una historia de amor durante la Segunda Guerra Mundial,1,7,2.00

@@ -1,0 +1,147 @@
+const cds = require('@sap/cds');
+
+module.exports = cds.service.impl(async function() {
+  const { Movies, Customers, Rentals } = this.entities;
+
+  // Acción para alquilar una película
+  this.on('rentMovie', async (req) => {
+    const { movieId, customerId, quantity } = req.data;
+    
+    try {
+      // Verificar que la película existe
+      const movie = await SELECT.one.from(Movies).where({ ID: movieId });
+      if (!movie) {
+        req.error(404, 'Película no encontrada');
+        return;
+      }
+
+      // Verificar que el cliente existe
+      const customer = await SELECT.one.from(Customers).where({ ID: customerId });
+      if (!customer) {
+        req.error(404, 'Cliente no encontrado');
+        return;
+      }
+
+      // Verificar stock disponible
+      if (movie.stock < quantity) {
+        req.error(400, `Stock insuficiente. Disponible: ${movie.stock}, Solicitado: ${quantity}`);
+        return;
+      }
+
+      // Crear el alquiler
+      const rental = {
+        customer_ID: customerId,
+        movie_ID: movieId,
+        quantity: quantity,
+        rentalDate: new Date().toISOString().split('T')[0],
+        status: 'ACTIVE',
+        totalPrice: movie.price * quantity
+      };
+
+      const result = await INSERT.into(Rentals).entries(rental);
+
+      // Actualizar stock y contador de alquileres
+      await UPDATE(Movies)
+        .set({
+          stock: movie.stock - quantity,
+          rentedCount: movie.rentedCount + quantity
+        })
+        .where({ ID: movieId });
+
+      return `Alquiler registrado exitosamente. ID: ${result.lastInsertRowid || 'generado'}`;
+
+    } catch (error) {
+      console.error('Error en rentMovie:', error);
+      req.error(500, 'Error interno del servidor');
+    }
+  });
+
+  // Acción para devolver una película
+  this.on('returnRental', async (req) => {
+    const { rentalId } = req.data;
+    
+    try {
+      // Buscar el alquiler
+      const rental = await SELECT.one
+        .from(Rentals, r => {
+          r.ID, r.quantity, r.status,
+          r.movie(m => { m.ID, m.stock })
+        })
+        .where({ ID: rentalId });
+
+      if (!rental) {
+        req.error(404, 'Alquiler no encontrado');
+        return;
+      }
+
+      if (rental.status === 'RETURNED') {
+        req.error(400, 'Este alquiler ya fue devuelto');
+        return;
+      }
+
+      // Marcar como devuelto
+      await UPDATE(Rentals)
+        .set({
+          status: 'RETURNED',
+          returnDate: new Date().toISOString().split('T')[0]
+        })
+        .where({ ID: rentalId });
+
+      // Reponer stock
+      await UPDATE(Movies)
+        .set({
+          stock: rental.movie.stock + rental.quantity
+        })
+        .where({ ID: rental.movie.ID });
+
+      return 'Película devuelta exitosamente';
+
+    } catch (error) {
+      console.error('Error en returnRental:', error);
+      req.error(500, 'Error interno del servidor');
+    }
+  });
+
+  // Función para obtener estadísticas
+  this.on('getMovieStats', async (req) => {
+    try {
+      const stats = await SELECT`
+        title as movieTitle,
+        rentedCount as totalRented,
+        stock as currentStock
+      `.from(Movies).orderBy('rentedCount desc');
+
+      return stats;
+    } catch (error) {
+      console.error('Error en getMovieStats:', error);
+      req.error(500, 'Error interno del servidor');
+    }
+  });
+
+  // Event handler antes de crear un alquiler (validación adicional)
+  this.before('CREATE', 'Rentals', async (req) => {
+    const { movie_ID, quantity } = req.data;
+    
+    if (quantity <= 0) {
+      req.error(400, 'La cantidad debe ser mayor a 0');
+    }
+
+    if (movie_ID) {
+      const movie = await SELECT.one.from(Movies).where({ ID: movie_ID });
+      if (movie && movie.stock < quantity) {
+        req.error(400, `Stock insuficiente para la película ${movie.title}`);
+      }
+    }
+  });
+
+  // Event handler después de leer películas (para calcular disponibilidad)
+  this.after('READ', 'Movies', (movies) => {
+    if (Array.isArray(movies)) {
+      movies.forEach(movie => {
+        movie.available = movie.stock > 0;
+      });
+    } else if (movies) {
+      movies.available = movies.stock > 0;
+    }
+  });
+});

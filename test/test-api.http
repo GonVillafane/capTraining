@@ -1,0 +1,218 @@
+# Pruebas de API para Videoclub CAP
+# Instrucciones:
+# 1. Asegúrate de que el servidor esté corriendo: npm run watch
+# 2. En VS Code instala la extensión "REST Client"
+# 3. Haz clic en "Send Request" sobre cada ###
+
+# Variable base para todas las peticiones
+@baseUrl = http://localhost:4004
+@catalogUrl = {{baseUrl}}/catalog
+
+### ------------------------------------------------------------------------
+# 🏠 Verificar que el servidor esté funcionando
+GET {{baseUrl}}
+
+### ------------------------------------------------------------------------
+# 📋 Obtener documento de servicio
+GET {{catalogUrl}}
+
+### ------------------------------------------------------------------------
+# 📋 Obtener metadatos del servicio
+GET {{catalogUrl}}/$metadata
+
+### ------------------------------------------------------------------------
+# 🎬 Obtener todas las películas
+GET {{catalogUrl}}/Movies
+
+### ------------------------------------------------------------------------
+# 🎬 Obtener una película específica
+GET {{catalogUrl}}/Movies/1
+
+### ------------------------------------------------------------------------
+# 👥 Obtener todos los clientes
+GET {{catalogUrl}}/Customers
+
+### ------------------------------------------------------------------------
+# 👥 Obtener un cliente específico
+GET {{catalogUrl}}/Customers/1
+
+### ------------------------------------------------------------------------
+# 📊 Obtener estadísticas de películas
+GET {{catalogUrl}}/getMovieStats()
+
+### ------------------------------------------------------------------------
+# 📋 Obtener todos los alquileres (con datos expandidos)
+GET {{catalogUrl}}/Rentals?$expand=movie,customer
+
+### ------------------------------------------------------------------------
+# 📋 Obtener alquileres activos solamente
+GET {{catalogUrl}}/Rentals?$filter=status eq 'ACTIVE'&$expand=movie,customer
+
+### ------------------------------------------------------------------------
+# 🎬 Filtrar películas por género
+GET {{catalogUrl}}/Movies?$filter=genre eq 'Drama'
+
+### ------------------------------------------------------------------------
+# 🎬 Ordenar películas por veces alquiladas (descendente)
+GET {{catalogUrl}}/Movies?$orderby=rentedCount desc
+
+### ------------------------------------------------------------------------
+# 🎬 Obtener películas con stock disponible
+GET {{catalogUrl}}/Movies?$filter=stock gt 0
+
+### ------------------------------------------------------------------------
+# 🛒 ALQUILAR UNA PELÍCULA - El Padrino (ID=1) para Juan Pérez (ID=1)
+POST {{catalogUrl}}/rentMovie
+Content-Type: application/json
+
+{
+  "movieId": "1",
+  "customerId": "1", 
+  "quantity": 1
+}
+
+### ------------------------------------------------------------------------
+# 🛒 ALQUILAR MÚLTIPLES COPIAS - Matrix (ID=3) para María González (ID=2)
+POST {{catalogUrl}}/rentMovie
+Content-Type: application/json
+
+{
+  "movieId": "3",
+  "customerId": "2",
+  "quantity": 2
+}
+
+### ------------------------------------------------------------------------
+# ❌ PROBAR ERROR - Intentar alquilar más stock del disponible
+POST {{catalogUrl}}/rentMovie
+Content-Type: application/json
+
+{
+  "movieId": "1",
+  "customerId": "1",
+  "quantity": 10
+}
+
+### ------------------------------------------------------------------------
+# ❌ PROBAR ERROR - Película inexistente
+POST {{catalogUrl}}/rentMovie
+Content-Type: application/json
+
+{
+  "movieId": "999",
+  "customerId": "1",
+  "quantity": 1
+}
+
+### ------------------------------------------------------------------------
+# ❌ PROBAR ERROR - Cliente inexistente
+POST {{catalogUrl}}/rentMovie
+Content-Type: application/json
+
+{
+  "movieId": "1",
+  "customerId": "999",
+  "quantity": 1
+}
+
+### ------------------------------------------------------------------------
+# 🔄 Verificar el stock después de alquilar (debería haber bajado)
+GET {{catalogUrl}}/Movies/1
+
+### ------------------------------------------------------------------------
+# 📋 Ver alquileres creados
+GET {{catalogUrl}}/Rentals?$expand=movie,customer&$orderby=createdAt desc
+
+### ------------------------------------------------------------------------
+# 🔙 DEVOLVER PELÍCULA - Usar ID del alquiler (cambiar por el ID real)
+# NOTA: Después de crear alquileres, revisa el ID en la respuesta anterior
+POST {{catalogUrl}}/returnRental
+Content-Type: application/json
+
+{
+  "rentalId": "1a84af2c-f0d1-4107-8a95-2299d0149c76"
+}
+
+### ------------------------------------------------------------------------
+# ❌ PROBAR ERROR - Intentar devolver alquiler inexistente
+POST {{catalogUrl}}/returnRental
+Content-Type: application/json
+
+{
+  "rentalId": "999"
+}
+
+### ------------------------------------------------------------------------
+# ❌ PROBAR ERROR - Intentar devolver el mismo alquiler dos veces
+POST {{catalogUrl}}/returnRental
+Content-Type: application/json
+
+{
+  "rentalId": "1"
+}
+
+### ------------------------------------------------------------------------
+# 🔄 Verificar que el stock se repuso después de devolver
+GET {{catalogUrl}}/Movies/1
+
+### ------------------------------------------------------------------------
+# 📊 Ver estadísticas actualizadas
+GET {{catalogUrl}}/getMovieStats()
+
+### ------------------------------------------------------------------------
+# 📋 Ver estado final de todos los alquileres
+GET {{catalogUrl}}/Rentals?$expand=movie,customer&$orderby=createdAt desc
+
+### ------------------------------------------------------------------------
+# 🎬 Ver estado final de todas las películas
+GET {{catalogUrl}}/Movies?$orderby=rentedCount desc
+
+### ------------------------------------------------------------------------
+# 🔍 CONSULTAS AVANZADAS CON ODATA
+
+# Películas con más de 10 alquileres
+GET {{catalogUrl}}/Movies?$filter=rentedCount gt 10
+
+### ------------------------------------------------------------------------
+# Top 3 películas más alquiladas
+GET {{catalogUrl}}/Movies?$orderby=rentedCount desc&$top=3
+
+### ------------------------------------------------------------------------
+# Películas de Ciencia Ficción con stock disponible
+GET {{catalogUrl}}/Movies?$filter=genre eq 'Ciencia Ficción' and stock gt 0
+
+### ------------------------------------------------------------------------
+# Alquileres de un cliente específico
+GET {{catalogUrl}}/Rentals?$filter=customer_ID eq '1'&$expand=movie
+
+### ------------------------------------------------------------------------
+# Alquileres de una película específica
+GET {{catalogUrl}}/Rentals?$filter=movie_ID eq '1'&$expand=customer
+
+### ------------------------------------------------------------------------
+# 📊 CREAR CLIENTE NUEVO (opcional)
+POST {{catalogUrl}}/Customers
+Content-Type: application/json
+
+{
+  "name": "Pedro Ramírez",
+  "email": "pedro.ramirez@email.com",
+  "phone": "+54-381-6789012",
+  "address": "Av. Sarmiento 987 - San Miguel de Tucumán"
+}
+
+### ------------------------------------------------------------------------
+# 🎬 CREAR PELÍCULA NUEVA (opcional)
+POST {{catalogUrl}}/Movies
+Content-Type: application/json
+
+{
+  "title": "Spider-Man: No Way Home",
+  "genre": "Acción",
+  "director": "Jon Watts",
+  "year": 2021,
+  "description": "Peter Parker debe enfrentar villanos de universos paralelos",
+  "stock": 3,
+  "rentedCount": 0,
+  "price": 3.75
+}

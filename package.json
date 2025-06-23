@@ -1,0 +1,34 @@
+{
+  "name": "videoclub-cap",
+  "version": "1.0.0",
+  "description": "Sistema de gestión de alquiler de películas con CAP",
+  "repository": "<Add your repository here>",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@sap/cds": "^8",
+    "express": "^4"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^1"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "watch": "cds watch --verbose",
+    "build": "cds build",
+    "deploy": "cds deploy"
+  },
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "sqlite",
+        "credentials": {
+          "url": "db.sqlite"
+        }
+      }
+    },
+    "features": {
+      "sqlite": true
+    }
+  }
+}
