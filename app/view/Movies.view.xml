@@ -69,6 +69,7 @@
                                 visibleInFilterBar="true">
                                 <fb:control>
                                     <MultiComboBox
+                                        id="genreMultiCombo"
                                         selectedKeys="{view>/selectedGenres}"
                                         selectionChange="onFilterChange"
                                         items="{view>/genres}">

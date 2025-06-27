@@ -1,0 +1,239 @@
+<mvc:View
+    controllerName="com.videoclub.frontend.controller.Rentals"
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:fb="sap.ui.comp.filterbar">
+    
+    <f:DynamicPage headerExpanded="{view>/headerExpanded}">
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="📋 Gestión de Alquileres" level="H1"/>
+                </f:heading>
+                <f:navigationActions>
+                    <Button 
+                        icon="sap-icon://nav-back" 
+                        press="onNavBack"
+                        tooltip="Volver al inicio"/>
+                </f:navigationActions>
+                <f:expandedContent>
+                    <Label id="rentalsExpandedLabel" text="Todos los alquileres del sistema" />
+                </f:expandedContent>
+                <f:snappedContent>
+                    <Label id="rentalsSnappedLabel" text="Gestión de alquileres" />
+                </f:snappedContent>
+                <f:actions>
+                    <Button 
+                        text="Devolver Seleccionado" 
+                        type="Emphasized" 
+                        press="onReturnSelected"
+                        enabled="{= ${app>/selectedRental} !== null}"/>
+                </f:actions>
+            </f:DynamicPageTitle>
+        </f:title>
+        
+        <f:header>
+            <f:DynamicPageHeader>
+                <f:content>
+                    <fb:FilterBar 
+                        id="rentalsFilterbar" 
+                        persistencyKey="rentalFilterKey" 
+                        useToolbar="false" 
+                        search="onSearch" 
+                        filterChange="onFilterChange">
+                        
+                        <fb:filterGroupItems>
+                            <!-- Filtro de Búsqueda General -->
+                            <fb:FilterGroupItem 
+                                name="SearchQuery" 
+                                label="Búsqueda" 
+                                groupName="General" 
+                                visibleInFilterBar="true">
+                                <fb:control>
+                                    <SearchField
+                                        placeholder="Buscar por cliente, película..."
+                                        width="350px"
+                                        value="{view>/searchQuery}"
+                                        liveChange="onFilterChange"/>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            
+                            <!-- Filtro de Estado -->
+                            <fb:FilterGroupItem 
+                                name="Status" 
+                                label="Estado" 
+                                groupName="Alquiler" 
+                                visibleInFilterBar="true">
+                                <fb:control>
+                                    <ComboBox
+                                        selectedKey="{view>/selectedStatus}"
+                                        selectionChange="onFilterChange">
+                                        <core:Item key="" text="Todos"/>
+                                        <core:Item key="ACTIVE" text="Activos"/>
+                                        <core:Item key="RETURNED" text="Devueltos"/>
+                                    </ComboBox>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            
+                            <!-- Filtro de Cliente -->
+                            <fb:FilterGroupItem 
+                                name="Customer" 
+                                label="Cliente" 
+                                groupName="Personas" 
+                                visibleInFilterBar="true">
+                                <fb:control>
+                                    <ComboBox
+                                        selectedKey="{view>/selectedCustomer}"
+                                        selectionChange="onFilterChange"
+                                        items="{view>/customers}">
+                                        <core:Item key="" text="Todos los clientes"/>
+                                        <core:Item key="{view>id}" text="{view>name}"/>
+                                    </ComboBox>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            
+                            <!-- Filtro de Fecha -->
+                            <fb:FilterGroupItem 
+                                name="DateRange" 
+                                label="Periodo" 
+                                groupName="Tiempo" 
+                                visibleInFilterBar="true">
+                                <fb:control>
+                                    <ComboBox
+                                        selectedKey="{view>/selectedDateRange}"
+                                        selectionChange="onFilterChange">
+                                        <core:Item key="" text="Todos"/>
+                                        <core:Item key="today" text="Hoy"/>
+                                        <core:Item key="week" text="Esta semana"/>
+                                        <core:Item key="month" text="Este mes"/>
+                                        <core:Item key="overdue" text="Pendientes"/>
+                                    </ComboBox>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                        </fb:filterGroupItems>
+                    </fb:FilterBar>
+                </f:content>
+            </f:DynamicPageHeader>
+        </f:header>
+        
+        <f:content>
+            <Table
+                id="rentalsTable"
+                inset="false"
+                items="{path: '/Rentals', parameters: {$expand: 'movie,customer'}}"
+                growing="true"
+                growingThreshold="20"
+                selectionChange="onRentalSelect">
+                
+                <headerToolbar>
+                    <Toolbar>
+                        <Title text="Alquileres ({view>/filteredCount})" level="H2"/>
+                        <ToolbarSpacer/>
+                        <Button
+                            icon="sap-icon://refresh"
+                            tooltip="Actualizar lista"
+                            press="onRefresh"/>
+                        <Button
+                            icon="sap-icon://sort"
+                            tooltip="Ordenar"
+                            press="onSort"/>
+                    </Toolbar>
+                </headerToolbar>
+
+                <columns>
+                    <Column width="auto" minScreenWidth="Phone">
+                        <Text text="ID"/>
+                    </Column>
+                    <Column minScreenWidth="Phone">
+                        <Text text="Cliente"/>
+                    </Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
+                        <Text text="Película"/>
+                    </Column>
+                    <Column width="auto" hAlign="Center">
+                        <Text text="Cantidad"/>
+                    </Column>
+                    <Column width="auto" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
+                        <Text text="Fecha Alquiler"/>
+                    </Column>
+                    <Column width="auto" minScreenWidth="Desktop" demandPopin="true" popinDisplay="Inline">
+                        <Text text="Fecha Devolución"/>
+                    </Column>
+                    <Column width="auto" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline" hAlign="Right">
+                        <Text text="Total"/>
+                    </Column>
+                    <Column width="auto" hAlign="Center">
+                        <Text text="Estado"/>
+                    </Column>
+                    <Column width="auto" hAlign="Center">
+                        <Text text="Acciones"/>
+                    </Column>
+                </columns>
+
+                <items>
+                    <ColumnListItem press="onRentalSelect" type="Navigation">
+                        <cells>
+                            <Text text="{ID}"/>
+                            
+                            <HBox alignItems="Center">
+                                <core:Icon
+                                    src="sap-icon://person-placeholder"
+                                    class="sapUiTinyMarginEnd"/>
+                                <VBox>
+                                    <Text text="{customer/name}" class="sapMText"/>
+                                    <Text text="{customer/email}" 
+                                          class="sapUiTinyText sapMTextSecondary"/>
+                                </VBox>
+                            </HBox>
+                            
+                            <HBox alignItems="Center">
+                                <core:Icon
+                                    src="{path: 'movie/genre', formatter: '.formatGenreIcon'}"
+                                    class="sapUiTinyMarginEnd"/>
+                                <VBox>
+                                    <Text text="{movie/title}" class="sapMText"/>
+                                    <Text text="{movie/genre} • {movie/year}" 
+                                          class="sapUiTinyText sapMTextSecondary"/>
+                                </VBox>
+                            </HBox>
+                            
+                            <ObjectNumber 
+                                number="{quantity}" 
+                                state="Information"/>
+                            
+                            <Text text="{path: 'rentalDate', type: 'sap.ui.model.type.Date', formatOptions: {pattern: 'dd/MM/yyyy'}}"/>
+                            
+                            <Text text="{path: 'returnDate', type: 'sap.ui.model.type.Date', formatOptions: {pattern: 'dd/MM/yyyy'}}"/>
+                            
+                            <ObjectNumber 
+                                number="{totalPrice}" 
+                                unit="$"/>
+                            
+                            <ObjectStatus 
+                                text="{path: 'status', formatter: '.formatStatusText'}"
+                                state="{path: 'status', formatter: '.formatStatusState'}"/>
+                            
+                            <HBox alignItems="Center" justifyContent="Center">
+                                <Button 
+                                    icon="sap-icon://undo" 
+                                    text="Devolver"
+                                    type="Emphasized" 
+                                    press="onReturnRental"
+                                    enabled="{path: 'status', formatter: '.formatReturnEnabled'}"
+                                    class="sapUiTinyMarginEnd"/>
+                                <Button 
+                                    icon="sap-icon://detail-view"
+                                    tooltip="Ver detalles"
+                                    type="Transparent" 
+                                    press="onShowRentalDetails"/>
+                            </HBox>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>
