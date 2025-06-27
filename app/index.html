@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎬 Videoclub - Sistema de Gestión</title>
+    <script
+        id="sap-ui-bootstrap"
+        src="https://ui5.sap.com/1.120.0/resources/sap-ui-core.js"
+        data-sap-ui-theme="sap_horizon"
+        data-sap-ui-resourceroots='{
+            "com.videoclub.frontend": "./"
+        }'
+        data-sap-ui-compatVersion="edge"
+        data-sap-ui-async="true"
+        data-sap-ui-frameOptions="trusted">
+    </script>
+    <script>
+        sap.ui.getCore().attachInit(function () {
+            new sap.ui.core.ComponentContainer({
+                name: "com.videoclub.frontend",
+                settings: {
+                    id: "videoclubApp"
+                },
+                async: true
+            }).placeAt("content");
+        });
+    </script>
+    <style>
+        html, body, #content {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .tilePointer {
+            cursor: pointer;
+        }
+        .tilePointer:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body class="sapUiBody" id="content">
+</body>
+</html>

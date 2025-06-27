@@ -22,6 +22,18 @@ module.exports = cds.service.impl(async function() {
         return;
       }
 
+      // Verificar que el cliente no tenga ya un alquiler activo de esta película
+      const existingRental = await SELECT.one.from(Rentals).where({ 
+        customer_ID: customerId, 
+        movie_ID: movieId,
+        status: 'ACTIVE'
+      });
+      
+      if (existingRental) {
+        req.error(400, `El cliente "${customer.name}" ya tiene un alquiler activo de "${movie.title}". Debe devolverlo antes de alquilar nuevamente o incrementar la cantidad del alquiler existente.`);
+        return;
+      }
+
       // Verificar stock disponible
       if (movie.stock < quantity) {
         req.error(400, `Stock insuficiente. Disponible: ${movie.stock}, Solicitado: ${quantity}`);
@@ -98,6 +110,59 @@ module.exports = cds.service.impl(async function() {
 
     } catch (error) {
       console.error('Error en returnRental:', error);
+      req.error(500, 'Error interno del servidor');
+    }
+  });
+
+  // Acción para incrementar cantidad de un alquiler existente
+  this.on('increaseRental', async (req) => {
+    const { rentalId, additionalQuantity } = req.data;
+    
+    try {
+      // Buscar el alquiler activo
+      const rental = await SELECT.one
+        .from(Rentals, r => {
+          r.ID, r.quantity, r.status, r.movie_ID, r.totalPrice,
+          r.movie(m => { m.ID, m.stock, m.title, m.price })
+        })
+        .where({ ID: rentalId });
+
+      if (!rental) {
+        req.error(404, 'Alquiler no encontrado');
+        return;
+      }
+
+      if (rental.status !== 'ACTIVE') {
+        req.error(400, 'Solo se puede incrementar alquileres activos');
+        return;
+      }
+
+      // Verificar stock disponible
+      if (rental.movie.stock < additionalQuantity) {
+        req.error(400, `Stock insuficiente. Disponible: ${rental.movie.stock}, Solicitado: ${additionalQuantity}`);
+        return;
+      }
+
+      // Actualizar alquiler
+      await UPDATE(Rentals)
+        .set({ 
+          quantity: rental.quantity + additionalQuantity,
+          totalPrice: rental.totalPrice + (additionalQuantity * rental.movie.price)
+        })
+        .where({ ID: rentalId });
+
+      // Actualizar stock
+      await UPDATE(Movies)
+        .set({
+          stock: rental.movie.stock - additionalQuantity,
+          rentedCount: rental.movie.rentedCount + additionalQuantity
+        })
+        .where({ ID: rental.movie_ID });
+
+      return `Alquiler incrementado exitosamente. Nueva cantidad: ${rental.quantity + additionalQuantity}`;
+
+    } catch (error) {
+      console.error('Error en increaseRental:', error);
       req.error(500, 'Error interno del servidor');
     }
   });

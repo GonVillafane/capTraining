@@ -1,0 +1,64 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    
+    <Dialog title="🎬 Alquilar Película" 
+            contentWidth="30rem" 
+            resizable="true" 
+            draggable="true">
+        
+        <content>
+            <VBox class="sapUiMediumMargin">
+                <!-- Información de la película -->
+                <Panel headerText="Película Seleccionada" class="sapUiResponsiveMargin">
+                    <VBox class="sapUiSmallMargin">
+                        <Label text="Título:" class="sapUiSmallMarginBottom"/>
+                        <Text text="{rent>/movie/title}" class="sapMText sapUiSmallMarginBottom"/>
+                        
+                        <Label text="Género:" class="sapUiSmallMarginBottom"/>
+                        <Text text="{rent>/movie/genre}" class="sapUiSmallMarginBottom"/>
+                        
+                        <Label text="Precio por unidad:" class="sapUiSmallMarginBottom"/>
+                        <ObjectNumber number="{rent>/movie/price}" unit="$" class="sapUiSmallMarginBottom"/>
+                        
+                        <Label text="Stock disponible:" class="sapUiSmallMarginBottom"/>
+                        <ObjectNumber number="{rent>/movie/stock}" 
+                                    state="{= ${rent>/movie/stock} > 0 ? 'Success' : 'Error'}"/>
+                    </VBox>
+                </Panel>
+                
+                <!-- Formulario de alquiler -->
+                <Panel headerText="Datos del Alquiler" class="sapUiResponsiveMargin">
+                    <VBox class="sapUiSmallMargin">
+                        <Label text="Cliente:" class="sapUiSmallMarginBottom"/>
+                        <ComboBox selectedKey="{rent>/customerId}" 
+                                  placeholder="Selecciona un cliente"
+                                  items="{rent>/customers}"
+                                  class="sapUiSmallMarginBottom">
+                            <core:Item key="{rent>id}" text="{rent>name} - {rent>email}"/>
+                        </ComboBox>
+                        
+                        <Label text="Cantidad:" class="sapUiSmallMarginBottom"/>
+                        <StepInput value="{rent>/quantity}" 
+                                   min="1" 
+                                   max="{rent>/movie/stock}"
+                                   class="sapUiSmallMarginBottom"/>
+                        
+                        <Label text="Total a pagar:" class="sapUiSmallMarginBottom"/>
+                        <ObjectNumber number="{= ${rent>/movie/price} * ${rent>/quantity}}" 
+                                    unit="$" 
+                                    emphasized="true"/>
+                    </VBox>
+                </Panel>
+            </VBox>
+        </content>
+        
+        <buttons>
+            <Button text="Alquilar" 
+                    type="Emphasized" 
+                    press="onConfirmRent"/>
+            <Button text="Cancelar" 
+                    press="onCancelRent"/>
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

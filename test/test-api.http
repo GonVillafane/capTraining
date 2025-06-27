@@ -117,7 +117,7 @@ Content-Type: application/json
 
 ### ------------------------------------------------------------------------
 # 🔄 Verificar el stock después de alquilar (debería haber bajado)
-GET {{catalogUrl}}/Movies/1
+GET {{catalogUrl}}/Movies/3
 
 ### ------------------------------------------------------------------------
 # 📋 Ver alquileres creados
@@ -130,7 +130,7 @@ POST {{catalogUrl}}/returnRental
 Content-Type: application/json
 
 {
-  "rentalId": "1a84af2c-f0d1-4107-8a95-2299d0149c76"
+  "rentalId": "d9fdeeb6-c1f4-4b14-9d46-216f6909cb3d"
 }
 
 ### ------------------------------------------------------------------------

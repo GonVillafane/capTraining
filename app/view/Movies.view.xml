@@ -1,0 +1,268 @@
+<mvc:View
+    controllerName="com.videoclub.frontend.controller.Movies"
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:fb="sap.ui.comp.filterbar">
+    
+    <f:DynamicPage headerExpanded="{view>/headerExpanded}">
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="🎬 Catálogo de Películas" level="H1"/>
+                </f:heading>
+                <f:navigationActions>
+                    <Button 
+                        icon="sap-icon://nav-back" 
+                        press="onNavBack"
+                        tooltip="Volver al inicio"/>
+                </f:navigationActions>
+                <f:expandedContent>
+                    <Label id="expandedLabel" text="Todas las películas disponibles" />
+                </f:expandedContent>
+                <f:snappedContent>
+                    <Label id="snappedLabel" text="Catálogo completo" />
+                </f:snappedContent>
+                <f:actions>
+                    <Button 
+                        text="Alquilar Seleccionada" 
+                        type="Emphasized" 
+                        press="onRentSelected"
+                        enabled="{= ${app>/selectedMovie} !== null}"/>
+                </f:actions>
+            </f:DynamicPageTitle>
+        </f:title>
+        
+        <f:header>
+            <f:DynamicPageHeader>
+                <f:content>
+                    <fb:FilterBar 
+                        id="filterbar" 
+                        persistencyKey="movieFilterKey" 
+                        useToolbar="false" 
+                        search="onSearch" 
+                        filterChange="onFilterChange">
+                        
+                        <fb:filterGroupItems>
+                            <!-- Filtro de Búsqueda General -->
+                            <fb:FilterGroupItem 
+                                name="SearchQuery" 
+                                label="Búsqueda" 
+                                groupName="General" 
+                                visibleInFilterBar="true">
+                                <fb:control>
+                                    <SearchField
+                                        placeholder="Buscar por título, director, descripción..."
+                                        width="350px"
+                                        value="{view>/searchQuery}"
+                                        liveChange="onFilterChange"/>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            
+                            <!-- Filtro de Género -->
+                            <fb:FilterGroupItem 
+                                name="Genre" 
+                                label="Género" 
+                                groupName="Categorías" 
+                                visibleInFilterBar="true">
+                                <fb:control>
+                                    <MultiComboBox
+                                        selectedKeys="{view>/selectedGenres}"
+                                        selectionChange="onFilterChange"
+                                        items="{view>/genres}">
+                                        <core:Item key="{view>key}" text="{view>text}"/>
+                                    </MultiComboBox>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            
+                            <!-- Filtro de Disponibilidad -->
+                            <fb:FilterGroupItem 
+                                name="Availability" 
+                                label="Disponibilidad" 
+                                groupName="Stock" 
+                                visibleInFilterBar="true">
+                                <fb:control>
+                                    <ComboBox
+                                        selectedKey="{view>/selectedAvailability}"
+                                        selectionChange="onFilterChange">
+                                        <core:Item key="" text="Todas"/>
+                                        <core:Item key="available" text="Disponibles"/>
+                                        <core:Item key="outOfStock" text="Agotadas"/>
+                                    </ComboBox>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            
+                            <!-- Filtro de Rango de Años -->
+                            <fb:FilterGroupItem 
+                                name="YearRange" 
+                                label="Década" 
+                                groupName="Tiempo" 
+                                visibleInFilterBar="true">
+                                <fb:control>
+                                    <ComboBox
+                                        selectedKey="{view>/selectedYearRange}"
+                                        selectionChange="onFilterChange">
+                                        <core:Item key="" text="Todas"/>
+                                        <core:Item key="2020s" text="2020s"/>
+                                        <core:Item key="2010s" text="2010s"/>
+                                        <core:Item key="2000s" text="2000s"/>
+                                        <core:Item key="1990s" text="1990s"/>
+                                        <core:Item key="1980s" text="1980s"/>
+                                        <core:Item key="1970s" text="1970s"/>
+                                        <core:Item key="classics" text="Clásicos (&lt;1970)"/>
+                                    </ComboBox>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            
+                            <!-- Filtro de Popularidad -->
+                            <fb:FilterGroupItem 
+                                name="Popularity" 
+                                label="Popularidad" 
+                                groupName="Métricas" 
+                                visibleInFilterBar="true">
+                                <fb:control>
+                                    <ComboBox
+                                        selectedKey="{view>/selectedPopularity}"
+                                        selectionChange="onFilterChange">
+                                        <core:Item key="" text="Todas"/>
+                                        <core:Item key="popular" text="Muy Populares (20+ alquileres)"/>
+                                        <core:Item key="moderate" text="Populares (10-19 alquileres)"/>
+                                        <core:Item key="new" text="Poco alquiladas (&lt;10 alquileres)"/>
+                                    </ComboBox>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                        </fb:filterGroupItems>
+                    </fb:FilterBar>
+                </f:content>
+            </f:DynamicPageHeader>
+        </f:header>
+        
+        <f:content>
+            <Table
+                id="moviesTable"
+                inset="false"
+                items="{/Movies}"
+                growing="true"
+                growingThreshold="20"
+                selectionChange="onMovieSelect">
+                
+                <headerToolbar>
+                    <Toolbar>
+                        <Title text="Películas ({view>/filteredCount})" level="H2"/>
+                        <ToolbarSpacer/>
+                        <Button
+                            icon="sap-icon://refresh"
+                            tooltip="Actualizar catálogo"
+                            press="onRefresh"/>
+                        <Button
+                            icon="sap-icon://sort"
+                            tooltip="Ordenar"
+                            press="onSort"/>
+                    </Toolbar>
+                </headerToolbar>
+
+                <columns>
+                    <Column width="auto" minScreenWidth="Phone">
+                        <Text text="ID"/>
+                    </Column>
+                    <Column minScreenWidth="Phone">
+                        <Text text="Película"/>
+                    </Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
+                        <Text text="Género"/>
+                    </Column>
+                    <Column minScreenWidth="Desktop" demandPopin="true" popinDisplay="Inline">
+                        <Text text="Director"/>
+                    </Column>
+                    <Column width="auto" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
+                        <Text text="Año"/>
+                    </Column>
+                    <Column width="auto" hAlign="Center">
+                        <Text text="Stock"/>
+                    </Column>
+                    <Column width="auto" minScreenWidth="Desktop" demandPopin="true" popinDisplay="Inline" hAlign="Center">
+                        <Text text="Popularidad"/>
+                    </Column>
+                    <Column width="auto" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline" hAlign="Right">
+                        <Text text="Precio"/>
+                    </Column>
+                    <Column width="auto" hAlign="Center">
+                        <Text text="Estado"/>
+                    </Column>
+                    <Column width="auto" hAlign="Center">
+                        <Text text="Acciones"/>
+                    </Column>
+                </columns>
+
+                <items>
+                    <ColumnListItem press="onMovieSelect" type="Navigation">
+                        <cells>
+                            <Text text="{ID}"/>
+                            
+                            <HBox alignItems="Center">
+                                <core:Icon
+                                    src="{path: 'genre', formatter: '.formatGenreIcon'}"
+                                    class="sapUiTinyMarginEnd"/>
+                                <VBox>
+                                    <Text text="{title}" class="sapMText"/>
+                                    <Text text="{description}" 
+                                          class="sapUiTinyText sapMTextSecondary"
+                                          maxLines="2"/>
+                                </VBox>
+                            </HBox>
+                            
+                            <Text text="{genre}"/>
+                            
+                            <Text text="{director}"/>
+                            
+                            <Text text="{year}"/>
+                            
+                            <HBox alignItems="Center" justifyContent="Center">
+                                <core:Icon
+                                    src="{path: 'stock', formatter: '.formatStockIcon'}"
+                                    class="sapUiTinyMarginEnd"/>
+                                <ObjectNumber 
+                                    number="{stock}" 
+                                    state="{path: 'stock', formatter: '.formatStockState'}"/>
+                            </HBox>
+                            
+                            <HBox alignItems="Center" justifyContent="Center">
+                                <core:Icon
+                                    src="sap-icon://trending-up"
+                                    class="sapUiTinyMarginEnd"/>
+                                <ObjectNumber 
+                                    number="{rentedCount}" 
+                                    state="{path: 'rentedCount', formatter: '.formatPopularityState'}"/>
+                            </HBox>
+                            
+                            <ObjectNumber 
+                                number="{price}" 
+                                unit="$"/>
+                            
+                            <ObjectStatus 
+                                text="{path: 'stock', formatter: '.formatAvailabilityText'}"
+                                state="{path: 'stock', formatter: '.formatAvailabilityState'}"/>
+                            
+                            <HBox alignItems="Center" justifyContent="Center">
+                                <Button 
+                                    icon="sap-icon://cart-2" 
+                                    text="Alquilar"
+                                    type="Emphasized" 
+                                    press="onRentMovie"
+                                    enabled="{path: 'stock', formatter: '.formatButtonEnabled'}"
+                                    class="sapUiTinyMarginEnd"/>
+                                <Button 
+                                    icon="sap-icon://detail-view"
+                                    tooltip="Ver detalles"
+                                    type="Transparent" 
+                                    press="onShowMovieDetails"/>
+                            </HBox>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

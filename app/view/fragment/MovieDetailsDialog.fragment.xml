@@ -1,0 +1,60 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    
+    <Dialog title="📽️ Detalles de la Película" 
+            contentWidth="25rem" 
+            resizable="true" 
+            draggable="true">
+        
+        <content>
+            <VBox class="sapUiMediumMargin">
+                <Panel headerText="{details>/movie/title}" class="sapUiResponsiveMargin">
+                    <VBox class="sapUiSmallMargin">
+                        <HBox class="sapUiSmallMarginBottom">
+                            <Label text="Género: " class="sapUiSmallMarginEnd"/>
+                            <Text text="{details>/movie/genre}"/>
+                        </HBox>
+                        
+                        <HBox class="sapUiSmallMarginBottom">
+                            <Label text="Director: " class="sapUiSmallMarginEnd"/>
+                            <Text text="{details>/movie/director}"/>
+                        </HBox>
+                        
+                        <HBox class="sapUiSmallMarginBottom">
+                            <Label text="Año: " class="sapUiSmallMarginEnd"/>
+                            <Text text="{details>/movie/year}"/>
+                        </HBox>
+                        
+                        <VBox class="sapUiSmallMarginBottom">
+                            <Label text="Descripción:" class="sapUiSmallMarginBottom"/>
+                            <Text text="{details>/movie/description}" class="sapMTextSmall"/>
+                        </VBox>
+                        
+                        <HBox class="sapUiSmallMarginBottom">
+                            <Label text="Precio: " class="sapUiSmallMarginEnd"/>
+                            <ObjectNumber number="{details>/movie/price}" unit="$"/>
+                        </HBox>
+                        
+                        <HBox class="sapUiSmallMarginBottom">
+                            <Label text="Stock disponible: " class="sapUiSmallMarginEnd"/>
+                            <ObjectNumber number="{details>/movie/stock}" 
+                                        state="{= ${details>/movie/stock} > 0 ? 'Success' : 'Error'}"/>
+                        </HBox>
+                        
+                        <HBox class="sapUiSmallMarginBottom">
+                            <Label text="Veces alquilada: " class="sapUiSmallMarginEnd"/>
+                            <ObjectNumber number="{details>/movie/rentedCount}" 
+                                        state="Information"/>
+                        </HBox>
+                    </VBox>
+                </Panel>
+            </VBox>
+        </content>
+        
+        <buttons>
+            <Button text="Cerrar" 
+                    press="onCloseDetailsDialog"/>
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

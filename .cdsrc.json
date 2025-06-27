@@ -1,0 +1,26 @@
+{
+    "build": {
+      "target": "."
+    },
+    "hana": {
+      "deploy-format": "hdbtable"
+    },
+    "requires": {
+      "[production]": {
+        "db": "hana"
+      },
+      "[development]": {
+        "db": {
+          "kind": "sqlite",
+          "credentials": {
+            "url": "db.sqlite"
+          }
+        }
+      }
+    },
+    "serve": {
+      "CatalogService": {
+        "from": "srv/catalog-service"
+      }
+    }
+  }

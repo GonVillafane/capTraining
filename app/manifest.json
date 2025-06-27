@@ -1,0 +1,122 @@
+{
+    "_version": "1.58.0",
+    "sap.app": {
+      "id": "com.videoclub.frontend",
+      "type": "application",
+      "title": "{{appTitle}}",
+      "description": "{{appDescription}}",
+      "applicationVersion": {
+        "version": "1.0.0"
+      },
+      "dataSources": {
+        "CatalogService": {
+          "uri": "/catalog/",
+          "type": "OData",
+          "settings": {
+            "annotations": [],
+            "odataVersion": "4.0"
+          }
+        }
+      }
+    },
+    "sap.ui": {
+      "technology": "UI5",
+      "deviceTypes": {
+        "desktop": true,
+        "tablet": true,
+        "phone": true
+      }
+    },
+    "sap.ui5": {
+      "dependencies": {
+        "minUI5Version": "1.120.0",
+        "libs": {
+          "sap.ui.core": {},
+          "sap.m": {},
+          "sap.ui.table": {},
+          "sap.suite.ui.commons": {}
+        }
+      },
+      "models": {
+        "": {
+          "dataSource": "CatalogService",
+          "type": "sap.ui.model.odata.v4.ODataModel",
+          "settings": {
+            "operationMode": "Server",
+            "autoExpandSelect": true,
+            "earlyRequests": false,
+            "groupId": "$auto"
+          }
+        },
+        "i18n": {
+          "type": "sap.ui.model.resource.ResourceModel",
+          "settings": {
+            "bundleName": "com.videoclub.frontend.i18n.i18n"
+          }
+        }
+      },
+      "routing": {
+        "config": {
+          "routerClass": "sap.m.routing.Router",
+          "viewType": "XML",
+          "async": true,
+          "viewPath": "com.videoclub.frontend.view",
+          "controlAggregation": "pages",
+          "controlId": "app",
+          "clearControlAggregation": false
+        },
+        "routes": [
+          {
+            "name": "main",
+            "pattern": "",
+            "target": ["app"]
+          },
+          {
+            "name": "movies",
+            "pattern": "movies",
+            "target": ["movies"]
+          },
+          {
+            "name": "rentals",
+            "pattern": "rentals",
+            "target": ["rentals"]
+          },
+          {
+            "name": "rent",
+            "pattern": "rent/{movieId}",
+            "target": ["rent"]
+          }
+        ],
+        "targets": {
+          "app": {
+            "viewType": "XML",
+            "viewId": "app",
+            "viewName": "App",
+            "controlId": "shell",
+            "controlAggregation": "content"
+          },
+          "movies": {
+            "viewType": "XML", 
+            "viewId": "movies",
+            "viewName": "Movies",
+            "controlId": "app",
+            "controlAggregation": "pages"
+          },
+          "rentals": {
+            "viewType": "XML",
+            "viewId": "rentals", 
+            "viewName": "Rentals",
+            "controlId": "app",
+            "controlAggregation": "pages"
+          },
+          "rent": {
+            "viewType": "XML",
+            "viewId": "rent",
+            "viewName": "RentMovie",
+            "controlId": "app",
+            "controlAggregation": "pages"
+          }
+        }
+      }
+    }
+  }

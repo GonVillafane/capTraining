@@ -1,0 +1,78 @@
+<mvc:View
+    controllerName="com.videoclub.frontend.controller.App"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    
+    <Shell id="shell">
+        <App id="app" class="sapUiSizeCompact">
+            <pages>
+                <Page id="mainPage" title="🎬 Sistema de Videoclub" showNavButton="false">
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+                            <HBox class="sapUiMediumMarginBottom" justifyContent="Center">
+                                <VBox class="sapUiLargeMargin" alignItems="Center">
+                                    <Title text="Gestión de Alquiler de Películas" level="H1" class="sapUiLargeMarginBottom"/>
+                                    <Text text="Selecciona una opción para comenzar" class="sapUiMediumMarginBottom"/>
+                                </VBox>
+                            </HBox>
+                            
+                            <HBox justifyContent="Center" wrap="Wrap">
+                                <!-- Tarjeta de Películas -->
+                                <VBox class="sapUiMediumMargin">
+                                    <GenericTile 
+                                        class="sapUiMediumMargin tilePointer"
+                                        header="Catálogo de Películas"
+                                        subheader="Ver y gestionar películas"
+                                        press="onNavToMovies"
+                                        width="20rem">
+                                        <TileContent>
+                                            <NumericContent 
+                                                value="{app>/movieCount}"
+                                                valueColor="Good"
+                                                indicator="Up"/>
+                                        </TileContent>
+                                    </GenericTile>
+                                </VBox>
+                                
+                                <!-- Tarjeta de Alquileres -->
+                                <VBox class="sapUiMediumMargin">
+                                    <GenericTile 
+                                        class="sapUiMediumMargin tilePointer"
+                                        header="Gestión de Alquileres"
+                                        subheader="Ver y devolver alquileres"
+                                        press="onNavToRentals"
+                                        width="20rem">
+                                        <TileContent>
+                                            <NumericContent 
+                                                value="{app>/activeRentals}"
+                                                valueColor="Critical"
+                                                indicator="None"/>
+                                        </TileContent>
+                                    </GenericTile>
+                                </VBox>
+                                
+                                <!-- Tarjeta de Estadísticas -->
+                                <VBox class="sapUiMediumMargin">
+                                    <GenericTile 
+                                        class="sapUiMediumMargin tilePointer"
+                                        header="Estadísticas"
+                                        subheader="Reportes y métricas"
+                                        press="onShowStats"
+                                        width="20rem">
+                                        <TileContent>
+                                            <NumericContent 
+                                                value="{app>/totalRevenue}"
+                                                valueColor="Neutral"
+                                                indicator="None"
+                                                truncateValueTo="5"/>
+                                        </TileContent>
+                                    </GenericTile>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                    </content>
+                </Page>
+            </pages>
+        </App>
+    </Shell>
+</mvc:View>

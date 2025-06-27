@@ -10,25 +10,33 @@
     "express": "^4"
   },
   "devDependencies": {
-    "@cap-js/sqlite": "^1"
+    "@cap-js/sqlite": "^1",
+    "@sap/cds-dk": "^8"
   },
   "scripts": {
     "start": "cds-serve",
-    "watch": "cds watch --verbose",
+    "watch": "cds watch",
     "build": "cds build",
     "deploy": "cds deploy"
   },
   "cds": {
     "requires": {
-      "db": {
-        "kind": "sqlite",
-        "credentials": {
-          "url": "db.sqlite"
+      "[production]": {
+        "db": "hana"
+      },
+      "[development]": {
+        "db": {
+          "kind": "sqlite",
+          "credentials": {
+            "url": "db.sqlite"
+          }
         }
       }
     },
-    "features": {
-      "sqlite": true
+    "serve": {
+      "CatalogService": {
+        "from": "srv/catalog-service"
+      }
     }
   }
 }
