@@ -91,9 +91,7 @@
         "app": {
           "viewType": "XML",
           "viewId": "app",
-          "viewName": "App",
-          "controlId": "shell",
-          "controlAggregation": "content"
+          "viewName": "App"
         },
         "movies": {
           "viewType": "XML", 
