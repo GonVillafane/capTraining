@@ -247,7 +247,6 @@ sap.ui.define([
             const oContext = oSelectedItem.getBindingContext();
             
             if (oContext) {
-                // Usar requestObject() para OData V4
                 oContext.requestObject().then(function(oMovieData) {
                     this.getOwnerComponent().getModel("app").setProperty("/selectedMovie", oMovieData);
                 }.bind(this)).catch(function(oError) {
@@ -277,7 +276,6 @@ sap.ui.define([
                 return;
             }
             
-            // Usar requestObject() para OData V4
             oContext.requestObject().then(function(oMovieData) {
                 this._openRentDialog(oMovieData);
             }.bind(this)).catch(function(oError) {
@@ -295,7 +293,6 @@ sap.ui.define([
                 return;
             }
             
-            // Usar requestObject() para OData V4
             oContext.requestObject().then(function(oMovieData) {
                 this._showMovieDetailsDialog(oMovieData);
             }.bind(this)).catch(function(oError) {
@@ -366,7 +363,6 @@ sap.ui.define([
             return iStock > 0;
         },
 
-        // Métodos privados
         _loadGenres: function () {
             const oModel = this.getView().getModel();
             if (!oModel) return;
@@ -376,7 +372,6 @@ sap.ui.define([
                 const aGenres = [];
                 const oGenreSet = new Set();
                 
-                // Usar requestObject() para cada contexto
                 const aPromises = aContexts.map(function(oContext) {
                     return oContext.requestObject();
                 });
@@ -477,19 +472,15 @@ sap.ui.define([
             // Mostrar loading
             this._oRentDialog.setBusy(true);
             
-            // Para OData V4, usar bindContext con parámetros específicos
             const oBinding = oModel.bindContext("/rentMovie(...)");
             
-            // Establecer parámetros para la acción
             oBinding.setParameter("movieId", oRentData.movie.ID);
             oBinding.setParameter("customerId", oRentData.customerId);
             oBinding.setParameter("quantity", oRentData.quantity);
             
-            // Ejecutar la acción
             oBinding.execute().then(function () {
                 this._oRentDialog.setBusy(false);
                 
-                // Para acciones que retornan valores simples en OData V4
                 try {
                     const oResult = oBinding.getBoundContext().getObject();
                     const sMessage = oResult.value || oResult || "Película alquilada exitosamente";
@@ -506,7 +497,6 @@ sap.ui.define([
                 this._oRentDialog.setBusy(false);
                 console.error("Error al alquilar película:", oError);
                 
-                // Extraer mensaje de error específico
                 let sErrorMessage = "Error desconocido";
                 if (oError.error && oError.error.message) {
                     sErrorMessage = oError.error.message;

@@ -10,10 +10,8 @@ sap.ui.define([
         },
 
         init: function () {
-            // Call the base component's init function
             UIComponent.prototype.init.apply(this, arguments);
 
-            // Set global models
             this.setModel(new JSONModel({
                 busy: false,
                 selectedMovie: null,
@@ -25,12 +23,10 @@ sap.ui.define([
                 totalRevenue: "0.00"
             }), "app");
 
-            // Create the views based on the url/hash
             this.getRouter().initialize();
         },
 
         createContent: function () {
-            // Create the app view
             return sap.ui.view({
                 viewName: "com.videoclub.frontend.view.App",
                 type: "XML",

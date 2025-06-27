@@ -7,11 +7,9 @@ service CatalogService @(path:'/catalog') {
   
   entity Rentals as projection on videoclub.Rentals;
   
-  // Acciones personalizadas
   action rentMovie(movieId: String, customerId: String, quantity: Integer) returns String;
   action returnRental(rentalId: String) returns String;
   
-  // Función para obtener estadísticas
   function getMovieStats() returns array of {
     movieTitle: String;
     totalRented: Integer;

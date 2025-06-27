@@ -8,12 +8,11 @@ sap.ui.define([
 
     return Controller.extend("com.videoclub.frontend.controller.App", {
         onInit: function () {
-            // Esperar a que el modelo esté disponible
+            
             const oModel = this.getView().getModel();
             if (oModel) {
                 oModel.attachMetadataLoaded(this._loadDashboardData.bind(this));
             } else {
-                // Si no hay modelo, intentar cargar después
                 setTimeout(this._loadDashboardData.bind(this), 1000);
             }
         },
@@ -40,7 +39,7 @@ sap.ui.define([
             }
 
             try {
-                // Cargar conteo de películas
+                // Cargar películas
                 const oMoviesBinding = oModel.bindList("/Movies");
                 oMoviesBinding.requestContexts().then(function (aContexts) {
                     const iMovieCount = aContexts.length;
@@ -93,7 +92,6 @@ sap.ui.define([
             }
             
             try {
-                // Llamar a la función de estadísticas (CDS 8 syntax)
                 const oOperation = oModel.bindContext("/getMovieStats(...)");
                 oOperation.invoke().then(function () {
                     const oResult = oOperation.getBoundContext().getProperty();
